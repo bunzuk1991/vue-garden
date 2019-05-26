@@ -43,41 +43,57 @@
           <v-icon small left>{{ item.icon }}</v-icon>
           {{ item.title }}
         </v-btn>
+        <v-btn
+          flat
+          class="hidden-sm-and-down"
+          v-if="isUserLoggedIn"
+          @click="logout"
+          @openDialog="true"
+        >
+          <v-icon small left>exit_to_app</v-icon>
+        </v-btn>
+        <app-confirm-dialog></app-confirm-dialog>
       </v-toolbar-items>
     </v-toolbar>
   </div>
 </template>
 
 <script>
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 export default {
+  components: {
+    AppConfirmDialog
+  },
   data () {
     return {
       drawer: false
     }
   },
   computed: {
+    isUserLoggedIn () {
+      return this.$store.getters.isUserLoggetIn
+    },
     menuItems () {
+      if (this.isUserLoggedIn) {
+        return [
+          {
+            icon: 'visibility',
+            title: 'Статті',
+            route: '/books'
+          },
+          {
+            icon: 'extension',
+            title: 'Слова',
+            route: '/words'
+          },
+          {
+            icon: 'account_circle',
+            title: 'Профіль',
+            route: '/profile'
+          }
+        ]
+      }
       return [
-        {
-          icon: 'visibility',
-          title: 'Статті',
-          route: '/books'
-        },
-        {
-          icon: 'extension',
-          title: 'Слова',
-          route: '/words'
-        },
-        {
-          icon: 'account_circle',
-          title: 'Профіль',
-          route: '/profile'
-        },
-        {
-          icon: 'exit_to_app',
-          title: 'Вийти',
-          route: '/logout'
-        },
         {
           icon: 'input',
           title: 'Увійти',
@@ -89,6 +105,15 @@ export default {
           route: '/signup'
         }
       ]
+    }
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('logoutUser')
+        .then(() => {
+          this.$router.push('/')
+        })
+        .catch(() => {})
     }
   }
 }
